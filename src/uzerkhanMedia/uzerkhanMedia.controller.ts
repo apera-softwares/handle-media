@@ -1,4 +1,4 @@
-import { Controller, Post, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Controller, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { UzerKhanMediaService } from "./uzerkhanMedia.service";
@@ -20,10 +20,11 @@ export class UzerKhanMediaController {
     ) { }
 
     @Post('add-media')
-    @UseInterceptors(FilesInterceptor('ss', 10, { storage }))
+    @UseInterceptors(FilesInterceptor('screenshot', 10, { storage }))
     uploadUzerkhanMedia(
-        @UploadedFiles() ss: Array<Express.Multer.File>
+        @Req() request: Request,
+        @UploadedFiles() screenshot: Array<Express.Multer.File>
     ) {
-        return this.uzerkhanMediaService.uploadUzerKhanMedia(ss)
+        return this.uzerkhanMediaService.uploadUzerKhanMedia(request, screenshot)
     }
 }
