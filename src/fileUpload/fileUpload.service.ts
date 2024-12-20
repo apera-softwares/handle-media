@@ -23,15 +23,15 @@ export class FileUploadService {
 
         try {
 
-            const uploadedFileNames: string[] = [];
+            const uploadedFilenames: string[] = [];
 
             for (const file of files) {
-                uploadedFileNames.push(file.filename);
+                uploadedFilenames.push(file.filename);
             }
 
             return {
                 message: "Files uploaded successfully",
-                fileNames: uploadedFileNames,
+                filenames: uploadedFilenames,
             };
 
         } catch (error) {
