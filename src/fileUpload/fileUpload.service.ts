@@ -26,11 +26,7 @@ export class FileUploadService {
             const uploadedFileNames: string[] = [];
 
             for (const file of files) {
-                if (file?.filename) {
-                    uploadedFileNames.push(file.filename);
-                } else {
-                    throw new HttpException("File upload failed for one of the files", HttpStatus.INTERNAL_SERVER_ERROR);
-                }
+                uploadedFileNames.push(file.filename);
             }
 
             return {
@@ -42,7 +38,7 @@ export class FileUploadService {
 
             console.log(error)
 
-            throw new HttpException("Something went wrong while adding screenshots", HttpStatus.INTERNAL_SERVER_ERROR)
+            throw new HttpException("Something went wrong while adding media", HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
 
