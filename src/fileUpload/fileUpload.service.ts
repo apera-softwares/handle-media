@@ -6,22 +6,9 @@ export class FileUploadService {
 
     async uploadMedia(request, files: Array<Express.Multer.File>) {
 
-        const authHeader: string = request?.headers?.authorization;
+        const token: string = request?.headers?.authorization;
 
-        const filePath = `${process.env.FILEPATH}uzerkhan/`
-
-        if (!authHeader) {
-
-            if (files && files.length > 0) {
-                for (const file of files) {
-                    await fs.unlink(`${filePath}${file.filename}`)
-                }
-            }
-
-            throw new HttpException("Access token not provided", HttpStatus.BAD_REQUEST);
-        }
-
-        const token = authHeader.split(" ")[1];
+        const filePath = `${process.env.FILEPATH}${request?.body?.foldername}/`
 
         if (token !== process.env.ACCESS_TOKEN) {
 
