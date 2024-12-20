@@ -4,11 +4,11 @@ import * as fs from 'fs-extra';
 @Injectable()
 export class FileUploadService {
 
-    async uploadMedia(request, files: Array<Express.Multer.File>) {
+    async uploadMedia(request: any, files: Array<Express.Multer.File>) {
 
         const token: string = request?.headers?.authorization;
 
-        const filePath = `${process.env.FILEPATH}${request?.body?.foldername}/`
+        const filePath = `${process.env.FILEPATH}uzerkhan/`
 
         if (token !== process.env.ACCESS_TOKEN) {
 
