@@ -1,8 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { UzerKhanMediaController } from './uzerkhanMedia/uzerkhanMedia.controller';
-import { UzerKhanMediaService } from './uzerkhanMedia/uzerkhanMedia.service';
+import { FileUploadController } from './fileUpload/fileUpload.controller';
+import { FileUploadService } from './fileUpload/fileUpload.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { ConfigModule } from '@nestjs/config';
@@ -19,11 +19,11 @@ import { ConfigModule } from '@nestjs/config';
   ],
   controllers: [
     AppController,
-    UzerKhanMediaController,
+    FileUploadController,
   ],
   providers: [
     AppService,
-    UzerKhanMediaService
+    FileUploadService
   ],
 })
 export class AppModule { }

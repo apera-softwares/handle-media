@@ -2,15 +2,15 @@ import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import * as fs from 'fs-extra';
 
 @Injectable()
-export class UzerKhanMediaService {
+export class FileUploadService {
 
-    async uploadUzerKhanMedia(request, files: Array<Express.Multer.File>) {
+    async uploadMedia(request, files: Array<Express.Multer.File>) {
 
         const authHeader: string = request?.headers?.authorization;
 
         const filePath = `${process.env.FILEPATH}uzerkhan/`
 
-        if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        if (!authHeader) {
 
             if (files && files.length > 0) {
                 for (const file of files) {
@@ -42,10 +42,7 @@ export class UzerKhanMediaService {
                 if (file?.filename) {
                     uploadedFileNames.push(file.filename);
                 } else {
-                    throw new HttpException(
-                        `File upload failed for one of the files`,
-                        HttpStatus.INTERNAL_SERVER_ERROR
-                    );
+                    throw new HttpException("File upload failed for one of the files", HttpStatus.INTERNAL_SERVER_ERROR);
                 }
             }
 
