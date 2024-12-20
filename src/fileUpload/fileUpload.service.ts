@@ -30,6 +30,8 @@ export class FileUploadService {
             }
 
             return {
+                status: true,
+                statusCode: 200,
                 message: "Files uploaded successfully",
                 filenames: uploadedFilenames,
             };
