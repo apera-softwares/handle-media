@@ -1,5 +1,5 @@
-import { Controller, Param, Post, Req, UploadedFiles, UseInterceptors } from "@nestjs/common";
-import { FilesInterceptor } from "@nestjs/platform-express";
+import { Controller, Param, Post, Req, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { FileUploadService } from "./fileUpload.service";
 import * as fs from 'fs-extra';
@@ -29,13 +29,25 @@ export class FileUploadController {
         private fileUploadService: FileUploadService
     ) { }
 
-    @Post('add-media/:foldername')
-    @UseInterceptors(FilesInterceptor('screenshot', 10, { storage }))
-    uploadMedia(
+    @Post('single-media/:foldername')
+    @UseInterceptors(FileInterceptor('media', { storage }))
+    uploadSingleMedia(
         @Req() request: Request,
         @Param('foldername') foldername: string,
-        @UploadedFiles() screenshot: Array<Express.Multer.File>
+        @UploadedFile() media: Express.Multer.File
     ) {
-        return this.fileUploadService.uploadMedia(request, foldername, screenshot)
+        return this.fileUploadService.uploadSingleMedia(request, foldername, media)
     }
+
+
+    @Post('multiple-media/:foldername')
+    @UseInterceptors(FilesInterceptor('media', 10, { storage }))
+    uploadMultipleMedia(
+        @Req() request: Request,
+        @Param('foldername') foldername: string,
+        @UploadedFiles() media: Array<Express.Multer.File>
+    ) {
+        return this.fileUploadService.uploadMultipleMedia(request, foldername, media)
+    }
+
 }

@@ -4,7 +4,41 @@ import * as fs from 'fs-extra';
 @Injectable()
 export class FileUploadService {
 
-    async uploadMedia(request: any, foldername: any, files: Array<Express.Multer.File>) {
+    async uploadSingleMedia(request: any, foldername: any, file: Express.Multer.File) {
+
+        const token: string = request?.headers?.authorization;
+
+        const filePath = `${process.env.FILEPATH}${foldername}/`
+
+        if (token !== process.env.ACCESS_TOKEN) {
+
+            await fs.unlink(`${filePath}${file.filename}`)
+
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+
+            return {
+                status: true,
+                statusCode: 200,
+                message: "File uploaded successfully",
+                file: file?.filename,
+            };
+
+        } catch (error) {
+
+            console.log(error)
+
+            await fs.unlink(`${filePath}${file.filename}`)
+
+            throw new HttpException("Something went wrong while adding media", HttpStatus.INTERNAL_SERVER_ERROR)
+
+        }
+    }
+
+
+    async uploadMultipleMedia(request: any, foldername: any, files: Array<Express.Multer.File>) {
 
         const token: string = request?.headers?.authorization;
 
@@ -37,8 +71,6 @@ export class FileUploadService {
             };
 
         } catch (error) {
-
-            console.log(error)
 
             throw new HttpException("Something went wrong while adding media", HttpStatus.INTERNAL_SERVER_ERROR)
 
