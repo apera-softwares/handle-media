@@ -1,0 +1,55 @@
+name: Node.js Project `Media Store for VPS` CI with SSDNode
+
+on:
+  push:
+    branches:
+      - "release/**"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    env:
+        PORT: ${{ secrets.PORT }}
+        FILEPATH: ${{ secrets.FILEPATH }}
+        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v3
+
+      - name: Install SSH dependencies
+        run: sudo apt-get install -y sshpass
+
+      - name: Deploy to SSDNode
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSDNODE_HOST }}
+          username: ${{ secrets.SSDNODE_USERNAME }}
+          password: ${{ secrets.SSDNODE_PASSWORD }}
+          script: |
+            # Navigate to the directory or create it if it doesn't exist
+            mkdir -p ~/centralized-media-store
+            cd ~/centralized-media-store
+            
+            # Pull the latest code from the repository
+            if [ -d ".git" ]; then
+              git reset --hard
+              git pull origin main
+            else
+              git clone ${{ secrets.REPO_URL }} .
+            fi
+
+            # Install dependencies
+            npm install
+
+            # Set environment variables
+            export PORT=${{ secrets.PORT }}
+            export FILEPATH=${{ secrets.FILEPATH }} 
+            export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} 
+
+            # Kill any existing process running on the same port
+            fuser -k 3000/tcp || true
+
+            # Start the application
+            nohup npm start &> app.log &
