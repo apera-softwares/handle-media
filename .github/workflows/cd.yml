@@ -28,28 +28,31 @@ jobs:
           username: ${{ secrets.SSDNODE_USERNAME }}
           password: ${{ secrets.SSDNODE_PASSWORD }}
           script: |
-            # Navigate to the directory or create it if it doesn't exist
-            mkdir -p ~/centralized-media-store
-            cd ~/centralized-media-store
+              sudo apt-get update
+              sudo apt-get install -y nodejs npm psmisc
+
+              mkdir -p ~/centralized-media-store
+              cd ~/centralized-media-store
+
+              if [ -d ".git" ]; then
+                git reset --hard
+                git pull origin main
+              else
+                rm -rf *
+                git clone ${{ secrets.REPO_URL }} .
+              fi
+
+              npm install
+
+              export PORT=${{ secrets.PORT }}
+              export FILEPATH=${{ secrets.FILEPATH }}
+              export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
+
+              fuser -k ${PORT}/tcp || true
+
+              nohup npm start &> app.log &
+
+
+
+
             
-            # Pull the latest code from the repository
-            if [ -d ".git" ]; then
-              git reset --hard
-              git pull origin main
-            else
-              git clone ${{ secrets.REPO_URL }} .
-            fi
-
-            # Install dependencies
-            npm install
-
-            # Set environment variables
-            export PORT=${{ secrets.PORT }}
-            export FILEPATH=${{ secrets.FILEPATH }} 
-            export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} 
-
-            # Kill any existing process running on the same port
-            fuser -k 3000/tcp || true
-
-            # Start the application
-            npm start
