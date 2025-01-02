@@ -31,9 +31,14 @@ jobs:
               sudo apt-get update
               sudo apt-get install -y nodejs npm psmisc
 
+              # Install PM2 globally
+              sudo npm install -g pm2
+
+              # Create the application directory if it doesn't exist
               mkdir -p ~/centralized-media-store
               cd ~/centralized-media-store
 
+              # Git pull or clone
               if [ -d ".git" ]; then
                 git reset --hard
                 git pull origin main
@@ -42,17 +47,25 @@ jobs:
                 git clone ${{ secrets.REPO_URL }} .
               fi
 
+              # Install dependencies
               npm install
 
+              # Export environment variables
               export PORT=${{ secrets.PORT }}
               export FILEPATH=${{ secrets.FILEPATH }}
               export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
 
+              # Kill any process running on the same port (optional)
               fuser -k ${PORT}/tcp || true
 
-              nohup npm start &> app.log &
+              # Start the app with PM2
+              pm2 start npm --name "centralized-media-store" -- start
 
+              # Ensure PM2 restarts the app after a server reboot
+              pm2 startup ubuntu
 
+              # Save the PM2 process list
+              pm2 save
 
-
-            
+              # Output PM2 logs (optional for debugging)
+              pm2 logs centralized-media-store
