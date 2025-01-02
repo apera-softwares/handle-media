@@ -31,15 +31,12 @@ jobs:
           username: ${{ secrets.SSDNODE_USERNAME }}
           password: ${{ secrets.SSDNODE_PASSWORD }}
           script: |
-            set -e  # Exit on error
-            set -x  # Debug mode
 
             # Update system packages
-            sudo apt-get update
-            sudo apt-get install -y curl nodejs npm psmisc
+              sudo apt-get install -y curl nodejs npm psmisc
 
             # Add Node.js repository and install latest version
-            curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+            curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
             sudo apt-get install -y nodejs
 
             # Install PM2 globally with proper permissions
