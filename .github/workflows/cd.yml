@@ -10,17 +10,20 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-        PORT: ${{ secrets.PORT }}
-        FILEPATH: ${{ secrets.FILEPATH }}
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+      PORT: ${{ secrets.PORT }}
+      FILEPATH: ${{ secrets.FILEPATH }}
+      ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
 
     steps:
+      # Step 1: Checkout the repository
       - name: Checkout the code
         uses: actions/checkout@v3
 
+      # Step 2: Install SSH dependencies
       - name: Install SSH dependencies
         run: sudo apt-get install -y sshpass
 
+      # Step 3: Deploy to SSDNode
       - name: Deploy to SSDNode
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -28,44 +31,52 @@ jobs:
           username: ${{ secrets.SSDNODE_USERNAME }}
           password: ${{ secrets.SSDNODE_PASSWORD }}
           script: |
-              sudo apt-get update
-              sudo apt-get install -y nodejs npm psmisc
+            set -e  # Exit on error
+            set -x  # Debug mode
 
-              # Install PM2 globally
-              sudo npm install -g pm2
+            # Update system packages
+            sudo apt-get update
+            sudo apt-get install -y curl nodejs npm psmisc
 
-              # Create the application directory if it doesn't exist
-              mkdir -p ~/centralized-media-store
-              cd ~/centralized-media-store
+            # Add Node.js repository and install latest version
+            curl -fsSL https://deb.nodesource.com/setup_16.x | sudo -E bash -
+            sudo apt-get install -y nodejs
 
-              # Git pull or clone
-              if [ -d ".git" ]; then
-                git reset --hard
-                git pull origin main
-              else
-                rm -rf *
-                git clone ${{ secrets.REPO_URL }} .
-              fi
+            # Install PM2 globally with proper permissions
+            sudo npm install -g pm2 --unsafe-perm
 
-              # Install dependencies
-              npm install
+            # Create the application directory if it doesn't exist
+            mkdir -p ~/centralized-media-store
+            cd ~/centralized-media-store
 
-              # Export environment variables
-              export PORT=${{ secrets.PORT }}
-              export FILEPATH=${{ secrets.FILEPATH }}
-              export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
+            # Pull or clone the repository
+            if [ -d ".git" ]; then
+              git reset --hard
+              git pull origin main
+            else
+              rm -rf *
+              git clone ${{ secrets.REPO_URL }} .
+            fi
 
-              # Kill any process running on the same port (optional)
-              fuser -k ${PORT}/tcp || true
+            # Install project dependencies
+            npm install
 
-              # Start the app with PM2
-              pm2 start npm --name "centralized-media-store" -- start
+            # Export environment variables
+            export PORT=${{ secrets.PORT }}
+            export FILEPATH=${{ secrets.FILEPATH }}
+            export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }}
 
-              # Ensure PM2 restarts the app after a server reboot
-              pm2 startup ubuntu
+            # Kill any process running on the same port (optional)
+            fuser -k ${PORT}/tcp || true
 
-              # Save the PM2 process list
-              pm2 save
+            # Start the app with PM2
+            pm2 start npm --name "centralized-media-store" -- start
 
-              # Output PM2 logs (optional for debugging)
-              pm2 logs centralized-media-store
+            # Ensure PM2 restarts the app after a server reboot
+            pm2 startup ubuntu -u $USER --hp $HOME
+
+            # Save the PM2 process list
+            pm2 save
+
+            # Optional: Output PM2 logs for debugging
+            pm2 logs centralized-media-store
