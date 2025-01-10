@@ -72,6 +72,12 @@ export class FileUploadService {
 
         } catch (error) {
 
+            if (files && files.length > 0) {
+                for (const file of files) {
+                    await fs.unlink(`${filePath}${file.filename}`);
+                }
+            }
+
             throw new HttpException("Something went wrong while adding media", HttpStatus.INTERNAL_SERVER_ERROR)
 
         }
