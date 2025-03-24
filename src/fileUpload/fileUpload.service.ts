@@ -6,7 +6,7 @@ export class FileUploadService {
 
     async uploadSingleMedia(request: any, foldername: any, file: Express.Multer.File) {
 
-        const token: string = request?.headers?.authorization;
+        const token: string = request?.headers?.authorization
 
         const filePath = `${process.env.FILEPATH}${foldername}/`
 
@@ -14,7 +14,7 @@ export class FileUploadService {
 
             await fs.unlink(`${filePath}${file.filename}`)
 
-            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST)
         }
 
         try {
@@ -40,7 +40,7 @@ export class FileUploadService {
 
     async uploadMultipleMedia(request: any, foldername: any, files: Array<Express.Multer.File>) {
 
-        const token: string = request?.headers?.authorization;
+        const token: string = request?.headers?.authorization
 
         const filePath = `${process.env.FILEPATH}${foldername}/`
 
@@ -48,19 +48,19 @@ export class FileUploadService {
 
             if (files && files.length > 0) {
                 for (const file of files) {
-                    await fs.unlink(`${filePath}${file.filename}`);
+                    await fs.unlink(`${filePath}${file.filename}`)
                 }
             }
 
-            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST);
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST)
         }
 
         try {
 
-            const uploadedFilenames: string[] = [];
+            const uploadedFilenames: string[] = []
 
             for (const file of files) {
-                uploadedFilenames.push(file.filename);
+                uploadedFilenames.push(file.filename)
             }
 
             return {
@@ -74,7 +74,7 @@ export class FileUploadService {
 
             if (files && files.length > 0) {
                 for (const file of files) {
-                    await fs.unlink(`${filePath}${file.filename}`);
+                    await fs.unlink(`${filePath}${file.filename}`)
                 }
             }
 
