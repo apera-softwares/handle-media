@@ -5,25 +5,23 @@ import { FileUploadService } from "./fileUpload.service";
 import * as fs from 'fs-extra';
 
 const storage = diskStorage({
-    destination: function (req, file, cb) {
+    destination: async function (req, file, cb) {
         const foldername = req?.params?.foldername
         const mediaPath = `${process.env.FILEPATH}${foldername}`
         try {
-            fs.ensureDir(mediaPath)
+            await fs.ensureDir(mediaPath)
             cb(null, mediaPath)
         } catch (err) {
             cb(new Error('Error creating folder'), null)
         }
     },
     filename: function (req, file, cb) {
-        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        // let extenstion = 'jpg';
-        // if (file?.originalname) {
-        //     extenstion = file?.originalname.split('.')[1]
-        // }
-        // cb(null, file.fieldname + '-' + uniqueSuffix + '.' + extenstion)
-
-        cb(null, file.originalname)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        let extenstion = 'jpg';
+        if (file?.originalname) {
+            extenstion = file?.originalname.split('.')[1]
+        }
+        cb(null, file.fieldname + '-' + uniqueSuffix + '.' + extenstion)
     }
 })
 
