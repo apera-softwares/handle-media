@@ -84,4 +84,35 @@ export class FileUploadService {
 
     }
 
+
+    async deleteMedia(request: any, foldername: string, filename: string) {
+
+        const token: string = request?.headers?.authorization
+
+        const filePath = `${process.env.FILEPATH}${foldername}/${filename}`
+
+        if (token !== process.env.ACCESS_TOKEN) {
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST)
+        }
+
+        try {
+            if (await fs.pathExists(filePath)) {
+
+                await fs.unlink(filePath)
+
+                return {
+                    status: true,
+                    statusCode: 200,
+                    message: "File deleted successfully",
+                }
+
+            } else {
+                throw new HttpException("File not found", HttpStatus.NOT_FOUND)
+            }
+        } catch (error) {
+            throw new HttpException("Something went wrong while deleting media", HttpStatus.INTERNAL_SERVER_ERROR)
+        }
+
+    }
+
 }
