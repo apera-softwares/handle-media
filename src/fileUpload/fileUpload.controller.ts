@@ -1,4 +1,4 @@
-import { Controller, Param, Post, Req, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
+import { Controller, Delete, Param, Post, Query, Req, UploadedFile, UploadedFiles, UseInterceptors } from "@nestjs/common";
 import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { FileUploadService } from "./fileUpload.service";
@@ -51,6 +51,16 @@ export class FileUploadController {
         @UploadedFiles() media: Array<Express.Multer.File>
     ) {
         return this.fileUploadService.uploadMultipleMedia(request, foldername, media)
+    }
+
+
+    @Delete("delete-media/:foldername")
+    deleteMedia(
+        @Req() request: any,
+        @Param("foldername") foldername: string,
+        @Query("filename") filename: string
+    ) {
+        return this.fileUploadService.deleteMedia(request, foldername, filename);
     }
 
 }
