@@ -25,6 +25,22 @@ const storage = diskStorage({
     }
 })
 
+const storage2 = diskStorage({
+    destination: async function (req, file, cb) {
+        const foldername = req?.params?.foldername
+        const mediaPath = `${process.env.FILEPATH}${foldername}`
+        try {
+            await fs.ensureDir(mediaPath)
+            cb(null, mediaPath)
+        } catch (err) {
+            cb(new Error('Error creating folder'), null)
+        }
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname)
+    }
+})
+
 @Controller('upload')
 export class FileUploadController {
 
@@ -61,6 +77,17 @@ export class FileUploadController {
         @Query("filename") filename: string
     ) {
         return this.fileUploadService.deleteMedia(request, foldername, filename);
+    }
+
+
+    @Post('bank-logo/:foldername')
+    @UseInterceptors(FilesInterceptor('media', 10, { storage: storage2 }))
+    uploadMultipleBankLogoMedia(
+        @Req() request: Request,
+        @Param('foldername') foldername: string,
+        @UploadedFiles() media: Array<Express.Multer.File>
+    ) {
+        return this.fileUploadService.uploadMultipleBankLogoMedia(request, foldername, media)
     }
 
 }
