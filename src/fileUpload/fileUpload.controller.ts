@@ -16,12 +16,14 @@ const storage = diskStorage({
         }
     },
     filename: function (req, file, cb) {
-        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
-        let extenstion = 'jpg';
-        if (file?.originalname) {
-            extenstion = file?.originalname.split('.')[1]
-        }
-        cb(null, file.fieldname + '-' + uniqueSuffix + '.' + extenstion)
+        // const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        // let extenstion = 'jpg';
+        // if (file?.originalname) {
+        //     extenstion = file?.originalname.split('.')[1]
+        // }
+        // cb(null, file.fieldname + '-' + uniqueSuffix + '.' + extenstion)
+
+        cb(null, file.originalname)
     }
 })
 
