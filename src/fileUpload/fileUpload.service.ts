@@ -115,4 +115,62 @@ export class FileUploadService {
 
     }
 
+
+    async uploadMultipleBankLogoMedia(request: any, foldername: any, files: Array<Express.Multer.File>) {
+
+        const token: string = request?.headers?.authorization
+
+        const filePath = `${process.env.FILEPATH}${foldername}/`
+
+        if (token !== process.env.ACCESS_TOKEN) {
+
+            if (files && files.length > 0) {
+                for (const file of files) {
+                    await fs.unlink(`${filePath}${file.filename}`)
+                }
+            }
+
+            throw new HttpException("Invalid token", HttpStatus.BAD_REQUEST)
+        }
+
+        if (foldername !== "auction") {
+
+            if (files && files.length > 0) {
+                for (const file of files) {
+                    await fs.unlink(`${filePath}${file.filename}`)
+                }
+            }
+
+            throw new HttpException("Foldername is invalid", HttpStatus.BAD_REQUEST)
+        }
+
+        try {
+
+            const uploadedFilenames: string[] = []
+
+            for (const file of files) {
+                uploadedFilenames.push(file.filename)
+            }
+
+            return {
+                status: true,
+                statusCode: 200,
+                message: "Bank logo uploaded successfully",
+                filenames: uploadedFilenames,
+            };
+
+        } catch (error) {
+
+            if (files && files.length > 0) {
+                for (const file of files) {
+                    await fs.unlink(`${filePath}${file.filename}`)
+                }
+            }
+
+            throw new HttpException("Something went wrong while adding bank logo", HttpStatus.INTERNAL_SERVER_ERROR)
+
+        }
+
+    }
+
 }
