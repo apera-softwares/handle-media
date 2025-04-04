@@ -102,14 +102,19 @@ export class FileUploadService {
 
                 return {
                     status: true,
-                    statusCode: 200,
+                    statusCode: HttpStatus.OK,
                     message: "File deleted successfully",
                 }
 
             } else {
-                throw new HttpException("File not found", HttpStatus.NOT_FOUND)
+                return {
+                    status: false,
+                    statusCode: HttpStatus.NOT_FOUND,
+                    message: "File not found",
+                }
             }
         } catch (error) {
+            console.log(error)
             throw new HttpException("Something went wrong while deleting media", HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
