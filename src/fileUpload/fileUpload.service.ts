@@ -114,7 +114,6 @@ export class FileUploadService {
                 }
             }
         } catch (error) {
-            console.log(error)
             throw new HttpException("Something went wrong while deleting media", HttpStatus.INTERNAL_SERVER_ERROR)
         }
 
