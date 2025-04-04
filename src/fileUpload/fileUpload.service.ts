@@ -104,6 +104,7 @@ export class FileUploadService {
                     status: true,
                     statusCode: HttpStatus.OK,
                     message: "File deleted successfully",
+                    filename: filename
                 }
 
             } else {
@@ -111,6 +112,7 @@ export class FileUploadService {
                     status: false,
                     statusCode: HttpStatus.NOT_FOUND,
                     message: "File not found",
+                    filename: filename
                 }
             }
         } catch (error) {
