@@ -3,7 +3,7 @@ import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { FileUploadService } from "./fileUpload.service";
 import * as fs from 'fs-extra';
-import { ApiOperation, ApiTags } from "@nestjs/swagger";
+import { ApiBody, ApiConsumes, ApiHeader, ApiOperation, ApiParam, ApiQuery, ApiTags } from "@nestjs/swagger";
 
 const storage = diskStorage({
     destination: async function (req, file, cb) {
@@ -52,7 +52,26 @@ export class FileUploadController {
 
     @ApiOperation({ summary: "Upload single file in the server" })
     @Post('single-media/:foldername')
+    @ApiHeader({
+        name: 'Authorization',
+        description: 'Custom token to access the API (no Bearer prefix)',
+        required: true,
+    })
     @UseInterceptors(FileInterceptor('media', { storage }))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ['media'],
+            properties: {
+                media: { type: 'string', format: 'binary' },
+            },
+        },
+    })
+    @ApiParam({
+        name: 'foldername',
+        type: String
+    })
     uploadSingleMedia(
         @Req() request: Request,
         @Param('foldername') foldername: string,
@@ -64,7 +83,26 @@ export class FileUploadController {
 
     @ApiOperation({ summary: "Upload multiple file (10 files only) in the server" })
     @Post('multiple-media/:foldername')
+    @ApiHeader({
+        name: 'Authorization',
+        description: 'Custom token to access the API (no Bearer prefix)',
+        required: true,
+    })
     @UseInterceptors(FilesInterceptor('media', 10, { storage }))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ['media'],
+            properties: {
+                media: { type: 'array', items: { type: 'string', format: 'binary' } },
+            },
+        },
+    })
+    @ApiParam({
+        name: 'foldername',
+        type: String
+    })
     uploadMultipleMedia(
         @Req() request: Request,
         @Param('foldername') foldername: string,
@@ -76,6 +114,16 @@ export class FileUploadController {
 
     @ApiOperation({ summary: "Delete file from the server" })
     @Delete("delete-media/:foldername")
+    @ApiHeader({
+        name: 'Authorization',
+        description: 'Custom token to access the API (no Bearer prefix)',
+        required: true,
+    })
+    @ApiParam({
+        name: 'foldername',
+        type: String
+    })
+    @ApiQuery({ name: 'filename', required: true, description: 'Name of the stored file on the server' })
     deleteMedia(
         @Req() request: any,
         @Param("foldername") foldername: string,
@@ -87,7 +135,26 @@ export class FileUploadController {
 
     @ApiOperation({ summary: "Upload bank logo (for E-AuctionsHub where max limit is 10)" })
     @Post('bank-logo/:foldername')
+    @ApiHeader({
+        name: 'Authorization',
+        description: 'Custom token to access the API (no Bearer prefix)',
+        required: true,
+    })
     @UseInterceptors(FilesInterceptor('media', 10, { storage: storage2 }))
+    @ApiConsumes('multipart/form-data')
+    @ApiBody({
+        schema: {
+            type: 'object',
+            required: ['media'],
+            properties: {
+                media: { type: 'array', items: { type: 'string', format: 'binary' } },
+            },
+        },
+    })
+    @ApiParam({
+        name: 'foldername',
+        type: String
+    })
     uploadMultipleBankLogoMedia(
         @Req() request: Request,
         @Param('foldername') foldername: string,
