@@ -3,6 +3,7 @@ import { FileInterceptor, FilesInterceptor } from "@nestjs/platform-express";
 import { diskStorage } from "multer";
 import { FileUploadService } from "./fileUpload.service";
 import * as fs from 'fs-extra';
+import { ApiOperation, ApiTags } from "@nestjs/swagger";
 
 const storage = diskStorage({
     destination: async function (req, file, cb) {
@@ -41,6 +42,7 @@ const storage2 = diskStorage({
     }
 })
 
+@ApiTags('File Upload')
 @Controller('upload')
 export class FileUploadController {
 
@@ -48,6 +50,7 @@ export class FileUploadController {
         private fileUploadService: FileUploadService
     ) { }
 
+    @ApiOperation({ summary: "Upload single file in the server" })
     @Post('single-media/:foldername')
     @UseInterceptors(FileInterceptor('media', { storage }))
     uploadSingleMedia(
@@ -59,6 +62,7 @@ export class FileUploadController {
     }
 
 
+    @ApiOperation({ summary: "Upload multiple file (10 files only) in the server" })
     @Post('multiple-media/:foldername')
     @UseInterceptors(FilesInterceptor('media', 10, { storage }))
     uploadMultipleMedia(
@@ -70,6 +74,7 @@ export class FileUploadController {
     }
 
 
+    @ApiOperation({ summary: "Delete file from the server" })
     @Delete("delete-media/:foldername")
     deleteMedia(
         @Req() request: any,
@@ -80,6 +85,7 @@ export class FileUploadController {
     }
 
 
+    @ApiOperation({ summary: "Upload bank logo (for E-AuctionsHub where max limit is 10)" })
     @Post('bank-logo/:foldername')
     @UseInterceptors(FilesInterceptor('media', 10, { storage: storage2 }))
     uploadMultipleBankLogoMedia(
