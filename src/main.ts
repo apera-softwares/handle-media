@@ -7,7 +7,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
-    .setTitle("Auction API's")
+    .setTitle("Centralized Media Store API's")
     .setVersion('1.0')
     .addBearerAuth()
     .build();
