@@ -88,7 +88,7 @@ export class FileUploadController {
         description: 'Custom token to access the API (no Bearer prefix)',
         required: true,
     })
-    @UseInterceptors(FilesInterceptor('media', 12, { storage }))
+    @UseInterceptors(FilesInterceptor('media', 10, { storage }))
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
