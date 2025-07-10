@@ -81,14 +81,14 @@ export class FileUploadController {
     }
 
 
-    @ApiOperation({ summary: "Upload multiple file (10 files only) in the server" })
+    @ApiOperation({ summary: "Upload multiple file (15 files only) in the server" })
     @Post('multiple-media/:foldername')
     @ApiHeader({
         name: 'Authorization',
         description: 'Custom token to access the API (no Bearer prefix)',
         required: true,
     })
-    @UseInterceptors(FilesInterceptor('media', 10, { storage }))
+    @UseInterceptors(FilesInterceptor('media', 15, { storage }))
     @ApiConsumes('multipart/form-data')
     @ApiBody({
         schema: {
