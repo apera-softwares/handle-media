@@ -13,7 +13,7 @@ services:
       ACCESS_TOKEN: '${ACCESS_TOKEN}'
 
     volumes:
-      - media-uploads:/app/uploads
+      - /root/centralized-media-store/uploads:/app/uploads
 
     networks:
       - centralized-media-store-network
