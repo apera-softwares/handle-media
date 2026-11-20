@@ -25,3 +25,4 @@ volumes:
 networks:
   centralized-media-store-network:
     name: centralized-media-store-network
+    external: true
