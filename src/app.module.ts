@@ -10,7 +10,7 @@ import { ConfigModule } from '@nestjs/config';
 @Module({
   imports: [
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'uploads'),
+      rootPath: process.env.FILEPATH || join(__dirname, '..', 'uploads'),
       serveRoot: '/uploads/'
     }),
     ConfigModule.forRoot({

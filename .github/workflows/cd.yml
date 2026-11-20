@@ -3,53 +3,50 @@ name: Node.js Project `Media Store for VPS` CI with SSDNode
 on:
   push:
     branches:
-      - "release/**"
+      - 'release/**'
 
-jobs:
-  build-and-deploy:
-    runs-on: ubuntu-latest
-
-    env:
-        PORT: ${{ secrets.PORT }}
-        FILEPATH: ${{ secrets.FILEPATH }}
-        ACCESS_TOKEN: ${{ secrets.ACCESS_TOKEN }}
-
+  jobs:
+  deploy:
+    runs-on: 'ubuntu-latest'
+    timeout-minutes: 25
     steps:
-      - name: Checkout the code
-        uses: actions/checkout@v3
+      - name: 'Checkout repository'
+        uses: 'actions/checkout@v4'
 
-      - name: Install SSH dependencies
-        run: sudo apt-get install -y sshpass
+      - name: 'Set up Docker Buildx'
+        uses: 'docker/setup-buildx-action@v3'
 
-      - name: Deploy to SSDNode
-        uses: appleboy/ssh-action@v1.0.3
+      - name: 'Login to Docker Hub'
+        uses: 'docker/login-action@v3'
         with:
-          host: ${{ secrets.SSDNODE_HOST }}
-          username: ${{ secrets.SSDNODE_USERNAME }}
-          password: ${{ secrets.SSDNODE_PASSWORD }}
-          script: |
-            # Navigate to the directory or create it if it doesn't exist
-            mkdir -p ~/centralized-media-store
-            cd ~/centralized-media-store
-            
-            # Pull the latest code from the repository
-            if [ -d ".git" ]; then
-              git reset --hard
-              git pull origin main
-            else
-              git clone ${{ secrets.REPO_URL }} .
-            fi
+          username: '${{ secrets.DOCKERHUB_USERNAME }}'
+          password: '${{ secrets.DOCKERHUB_TOKEN }}'
 
-            # Install dependencies
-            npm install
+      - name: 'Build and Push Docker Image'
+        uses: 'docker/build-push-action@v6'
+        with:
+          context: './backend'
+          push: true
+          no-cache: true
+          tags: 'aperrasolutions/centralized-media-store:latest'
+          secrets: |
+            DATABASE_URL=${{ secrets.DATABASE_URL }}
 
-            # Set environment variables
-            export PORT=${{ secrets.PORT }}
-            export FILEPATH=${{ secrets.FILEPATH }} 
-            export ACCESS_TOKEN=${{ secrets.ACCESS_TOKEN }} 
-
-            # Kill any existing process running on the same port
-            fuser -k 3000/tcp || true
-
-            # Start the application
-            nohup npm start &> app.log &
+      - name: 'Portainer Deploy'
+        uses: 'cssnr/portainer-stack-deploy-action@v1'
+        timeout-minutes: 15
+        with:
+          name: 'centralized-media-store'
+          type: 'file'
+          file: 'docker-compose.yml'
+          url: '${{ secrets.PORTAINER_HOST }}'
+          token: '${{ secrets.PORTAINER_TOKEN }}'
+          ref: ''
+          standalone: true
+          prune: true
+          pull: true
+          env_data: |
+            {
+               "PORT": "${{ secrets.PORT }}",
+               "ACCESS_TOKEN": "${{ secrets.ACCESS_TOKEN }}"
+            }
