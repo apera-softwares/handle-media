@@ -5,7 +5,7 @@ on:
     branches:
       - 'release/**'
 
-  jobs:
+jobs:
   deploy:
     runs-on: 'ubuntu-latest'
     timeout-minutes: 25
@@ -25,12 +25,10 @@ on:
       - name: 'Build and Push Docker Image'
         uses: 'docker/build-push-action@v6'
         with:
-          context: './backend'
+          context: '.'
           push: true
           no-cache: true
           tags: 'aperrasolutions/centralized-media-store:latest'
-          secrets: |
-            DATABASE_URL=${{ secrets.DATABASE_URL }}
 
       - name: 'Portainer Deploy'
         uses: 'cssnr/portainer-stack-deploy-action@v1'
