@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  media-store:
+    image: aperrasolutions/centralized-media-store:latest
+    container_name: centralized-media-store
+    restart: unless-stopped
+    ports:
+      - '4044:4044'
+    environment:
+      PORT: '${PORT}'
+      FILEPATH: '/app/uploads/'
+      ACCESS_TOKEN: '${ACCESS_TOKEN}'
+
+    volumes:
+      - media-uploads:/app/uploads
+
+    networks:
+      - centralized-media-store-network
+
+volumes:
+  media-uploads:
+    name: centralized-media-store-uploads
+
+networks:
+  centralized-media-store-network:
+    name: centralized-media-store-network
+    external: true
